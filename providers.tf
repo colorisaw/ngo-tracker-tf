@@ -22,7 +22,6 @@ provider "aws" {
       apigatewayv2   = endpoints.value
       autoscaling    = endpoints.value
       cloudformation = endpoints.value
-      cloudwatch     = endpoints.value
       cloudwatchlogs = endpoints.value
       dynamodb       = endpoints.value
       ec2            = endpoints.value
@@ -37,7 +36,6 @@ provider "aws" {
       kinesis        = endpoints.value
       kms            = endpoints.value
       lambda         = endpoints.value
-      logs           = endpoints.value
       rds            = endpoints.value
       route53        = endpoints.value
       s3             = endpoints.value
@@ -46,7 +44,7 @@ provider "aws" {
       sqs            = endpoints.value
       ssm            = endpoints.value
       sts            = endpoints.value
-      tag            = endpoints.value
+      #tag            = endpoints.value
     }
   }
 }

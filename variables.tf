@@ -1,3 +1,14 @@
+variable "project_name" {
+  description = "Nome base do projeto; usado em naming de recursos (ex.: ngo-tracker-dev-data)."
+  type        = string
+  default     = "ngo-tracker"
+
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]*$", var.project_name))
+    error_message = "O project_name deve conter apenas letras minúsculas, números e hífens."
+  }
+}
+
 variable "aws_region" {
   description = "Região AWS onde os recursos serão provisionados."
   type        = string

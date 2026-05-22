@@ -2,9 +2,38 @@
 
 Infraestrutura como código (Terraform) do projeto NGO Tracker, com suporte a desenvolvimento local via LocalStack (custo zero).
 
+## Arquitetura
+
+```mermaid
+flowchart TB
+  subgraph clients [Clientes futuros]
+    Web[Web / Mobile]
+    APIgw[API Gateway - fase futura]
+  end
+  subgraph compute [Compute]
+    Lambda[Lambda ngo-tracker-dev-api]
+  end
+  subgraph data [Dados]
+    DDB[(DynamoDB main)]
+    S3[(S3 data)]
+  end
+  subgraph security [Segurança]
+    IAM[IAM Role lambda-api]
+  end
+  Web --> APIgw
+  APIgw --> Lambda
+  IAM --> Lambda
+  Lambda --> DDB
+  Lambda --> S3
+  Lambda --> Logs[CloudWatch Logs]
+```
+
+A API (hoje um placeholder em Python) é o ponto central: lê/escreve auditoria de ONGs e doações no DynamoDB e armazena anexos/relatórios no S3.
+
 ## Documentação
 
 - [Checklist](docs/CHECKLIST.md) — andamento do projeto (o que foi feito e o que falta)
+- [Fase 3 — Infra da aplicação](docs/FASE3-APLICACAO.md) — S3, DynamoDB, IAM, Lambda
 - [Ficha técnica](docs/FICHA_TECNICA.md) — mais detalhes do que foi feito no projeto e justificativa das escolhas
 - [Rodar localmente](docs/RODAR_LOCALMENTE.md) — passo a passo para subir Docker/LocalStack e ter a infra rodando localmente
 

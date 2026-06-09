@@ -1,19 +1,19 @@
 # Checklist do projeto — NGO Tracker TF
- 
-> Última revisão: maio/2026 — progresso geral ~65%.
 
-**Legenda:** `[x]` feito · `[ ]` pendente
+> Última revisão: maio/2026 — progresso geral ~85%.
+
+**Legenda:** `[x]` feito · `[ ]` pendente · `[-]` adiado de propósito
 
 ---
 
 ## Progresso geral
 
 ```
-[████████████████████░░░░░░░░]  ~65%
+[█████████████████████████░░░]  ~85%
 
 Fundação     ████████████████████  100%
 1º recurso   ████████████████████  100%
-App infra    ░░░░░░░░░░░░░░░░░░░░    0%
+App infra    █████████████████░░░   85%
 CI / AWS     ░░░░░░░░░░░░░░░░░░░░    0%
 ```
 
@@ -37,25 +37,27 @@ CI / AWS     ░░░░░░░░░░░░░░░░░░░░    0%
 
 ## Fase 2 — Primeiro recurso
 
-- [x] `aws-storage.tf` — bucket `sre-terraform-state`
+- [x] Bucket S3 inicial (validação do ciclo plan/apply)
 - [x] `terraform apply` com sucesso
 - [x] Validação no LocalStack (`aws s3 ls` + `--endpoint-url`)
 - [x] Validação via `terraform state`
 - [x] Revisar/criar documentação
 
-
 ---
 
 ## Fase 3 — Infraestrutura da aplicação
 
-- [ ] `outputs.tf` (nome/ARN do bucket etc.)
-- [ ] DynamoDB (tabela do app NGO Tracker)
-- [ ] IAM (roles/policies para serviços)
-- [ ] Rede (VPC, subnets) — se necessário
-- [ ] Compute (EKS / ECS / Lambda) — conforme arquitetura
-- [ ] Organizar em módulos ou arquivos (`network.tf`, `iam.tf`, …)
-- [ ] Tags e naming padronizados com `environment`
-- [ ] Revisar/criar documentação
+- [x] `outputs.tf` (bucket, DynamoDB, Lambda, IAM)
+- [x] DynamoDB — tabela single-table `ngo-tracker-{env}-main`
+- [x] IAM — role + policy para Lambda (DynamoDB, S3, logs)
+- [x] S3 — bucket `ngo-tracker-{env}-data` (versioning, encryption, block public)
+- [x] Lambda — API placeholder (`lambda/handler.py`)
+- [x] Naming/tags padronizados (`project_name`, `environment`, `locals.name_prefix`)
+- [x] Arquivos organizados (`storage.tf`, `dynamodb.tf`, `iam.tf`, `lambda.tf`)
+- [x] Documentação — [FASE_2.md](FASE_2.md)
+- [ ] `terraform apply` da Fase 3 no LocalStack
+- [-] Rede (VPC, subnets) — adiado (Lambda sem VPC no MVP)
+- [-] EKS / ECS — adiado (fase futura, se necessário)
 
 ---
 
@@ -66,7 +68,7 @@ CI / AWS     ░░░░░░░░░░░░░░░░░░░░    0%
 - [ ] Volume persistente no LocalStack (`PERSISTENCE=1`) — opcional
 - [ ] CI GitHub Actions (`fmt`, `validate`, `plan`)
 - [ ] Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`)
-- [ ] Revisar/criar documentação
+- [ ] API Gateway + rota HTTP para a Lambda (opcional)
 
 ---
 
@@ -82,4 +84,14 @@ CI / AWS     ░░░░░░░░░░░░░░░░░░░░    0%
 
 ## Próximos passos sugeridos
 
-1. Configurar CI com `terraform plan` em PRs
+1. `terraform init` (provider `archive`) + `terraform apply`
+2. Validar Lambda e DynamoDB no LocalStack
+3. Configurar CI com `terraform plan` em PRs
+
+---
+
+## Documentação relacionada
+
+- [Infraestrutura da aplicação](INFRASTRUCTURE.md)
+- [Implementação do Terraform.md](TERRAFORM_IMPLEMENTATION.md)
+- [Passo a passo - Rodar localmente](RODAR_LOCALMENTE.md)

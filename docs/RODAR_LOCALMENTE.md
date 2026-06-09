@@ -16,8 +16,8 @@ Guia para rodar a partir do repositório `terraform-files` em sua máquina local
 3. Subir LocalStack (Docker)
 4. Health check
 5. Bootstrap S3 (backend) — se LocalStack estiver “vazio”
-6. Terraform (init se precisar → validate → plan)
-7. (Opcional) Validar bucket com AWS CLI
+6. Terraform (init se precisar → validate → plan → apply)
+7. Validar recursos (state, outputs, AWS CLI, invoke Lambda)
 ```
 
 Tempo estimado: **3–8 minutos**.
@@ -170,19 +170,125 @@ terraform apply
 
 ---
 
-### 7. Validar bucket da aplicação (opcional)
+### 7. Validar recursos após o `apply`
 
-Bucket em `aws-storage.tf`: `**sre-terraform-state**`
+Use **três camadas**: Terraform (state/outputs), AWS CLI no LocalStack e teste funcional.
+
+#### 7a) Preparar atalho do endpoint
 
 ```bash
-aws s3 ls --endpoint-url=http://localhost:4566
-
-aws s3api head-bucket \
-  --bucket sre-terraform-state \
-  --endpoint-url=http://localhost:4566
-
-terraform state list
+export AWS_ACCESS_KEY_ID=test
+export AWS_SECRET_ACCESS_KEY=test
+export AWS_DEFAULT_REGION=us-east-1
+export LS=http://localhost:4566
 ```
+
+#### 7b) Terraform — state e outputs
+
+```bash
+terraform state list
+terraform output
+```
+
+**`terraform state list` — 9 itens esperados:**
+
+```text
+data.archive_file.lambda_api          # zip local da Lambda (não é recurso AWS)
+aws_dynamodb_table.main
+aws_iam_role.lambda_api
+aws_iam_role_policy.lambda_api
+aws_lambda_function.api
+aws_s3_bucket.app_data
+aws_s3_bucket_public_access_block.app_data
+aws_s3_bucket_server_side_encryption_configuration.app_data
+aws_s3_bucket_versioning.app_data
+```
+
+> `data.archive_file.lambda_api` é normal: empacota `lambda/handler.py` antes do deploy.
+
+**`terraform output` — 9 valores esperados:**
+
+| Output | Exemplo em `dev` |
+|--------|------------------|
+| `environment` | `dev` |
+| `name_prefix` | `ngo-tracker-dev` |
+| `s3_app_data_bucket_name` | `ngo-tracker-dev-data` |
+| `s3_app_data_bucket_arn` | `arn:aws:s3:::ngo-tracker-dev-data` |
+| `dynamodb_table_name` | `ngo-tracker-dev-main` |
+| `dynamodb_table_arn` | `arn:aws:dynamodb:...` |
+| `lambda_api_function_name` | `ngo-tracker-dev-api` |
+| `lambda_api_arn` | `arn:aws:lambda:...` |
+| `lambda_api_role_arn` | `arn:aws:iam::...` |
+
+Outputs com sufixo `_arn` são intencionais (IAM, CI, integrações).
+
+#### 7c) S3 — bucket de dados
+
+```bash
+aws s3 ls --endpoint-url=$LS | grep ngo-tracker
+
+aws s3api head-bucket --bucket ngo-tracker-dev-data --endpoint-url=$LS
+
+echo "validacao" > /tmp/teste-ngo.txt
+aws s3 cp /tmp/teste-ngo.txt s3://ngo-tracker-dev-data/validacao/teste.txt --endpoint-url=$LS
+aws s3 ls s3://ngo-tracker-dev-data/validacao/ --endpoint-url=$LS
+```
+
+#### 7d) DynamoDB — tabela principal
+
+```bash
+aws dynamodb describe-table \
+  --table-name ngo-tracker-dev-main \
+  --endpoint-url=$LS \
+  --query 'Table.{Name:TableName,Status:TableStatus,Keys:KeySchema}'
+```
+
+Esperado: `Status: ACTIVE`, chaves `pk` e `sk`.
+
+#### 7e) IAM — role da Lambda
+
+```bash
+aws iam get-role \
+  --role-name ngo-tracker-dev-lambda-api \
+  --endpoint-url=$LS \
+  --query 'Role.{Name:RoleName,Arn:Arn}'
+```
+
+#### 7f) Lambda — invoke
+
+```bash
+aws lambda get-function \
+  --function-name ngo-tracker-dev-api \
+  --endpoint-url=$LS \
+  --query 'Configuration.{Name:FunctionName,State:State,Runtime:Runtime}'
+
+aws lambda invoke \
+  --function-name ngo-tracker-dev-api \
+  --endpoint-url=$LS \
+  --cli-binary-format raw-in-base64-out \
+  /tmp/lambda-out.json
+
+cat /tmp/lambda-out.json
+```
+
+Esperado: `State: Active` e JSON com `"ok": true`.
+
+#### 7g) Script único (checklist rápido)
+
+```bash
+cd ~/Claude/projeto-sre/terraform-files
+export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1
+LS=http://localhost:4566
+
+echo "=== STATE ===" && terraform state list
+echo "=== OUTPUTS ===" && terraform output
+echo "=== S3 ===" && aws s3 ls --endpoint-url=$LS | grep ngo-tracker
+echo "=== DYNAMODB ===" && aws dynamodb describe-table --table-name ngo-tracker-dev-main --endpoint-url=$LS --query 'Table.TableStatus' --output text
+echo "=== LAMBDA ===" && aws lambda get-function --function-name ngo-tracker-dev-api --endpoint-url=$LS --query 'Configuration.State' --output text
+echo "=== INVOKE ===" && aws lambda invoke --function-name ngo-tracker-dev-api --endpoint-url=$LS --cli-binary-format raw-in-base64-out /tmp/lambda-out.json && cat /tmp/lambda-out.json
+```
+
+> Sempre use `--endpoint-url` (ou `$LS`). Sem isso, o CLI consulta a AWS real.
 
 ---
 

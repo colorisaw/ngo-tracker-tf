@@ -1,6 +1,6 @@
 # Checklist do projeto — NGO Tracker TF
 
-> Última revisão: maio/2026 — progresso geral ~85%.
+> Última revisão: maio/2026 — progresso geral ~90%.
 
 **Legenda:** `[x]` feito · `[ ]` pendente · `[-]` adiado de propósito
 
@@ -9,11 +9,11 @@
 ## Progresso geral
 
 ```
-[█████████████████████████░░░]  ~85%
+[██████████████████████████░░]  ~90%
 
 Fundação     ████████████████████  100%
 1º recurso   ████████████████████  100%
-App infra    █████████████████░░░   85%
+App infra    ████████████████████  100%
 CI / AWS     ░░░░░░░░░░░░░░░░░░░░    0%
 ```
 
@@ -54,8 +54,9 @@ CI / AWS     ░░░░░░░░░░░░░░░░░░░░    0%
 - [x] Lambda — API placeholder (`lambda/handler.py`)
 - [x] Naming/tags padronizados (`project_name`, `environment`, `locals.name_prefix`)
 - [x] Arquivos organizados (`storage.tf`, `dynamodb.tf`, `iam.tf`, `lambda.tf`)
-- [x] Documentação — [FASE_2.md](FASE_2.md)
-- [ ] `terraform apply` da Fase 3 no LocalStack
+- [x] Documentação — [INFRASTRUCTURE.md](INFRASTRUCTURE.md)
+- [x] `terraform apply` da Fase 3 no LocalStack
+- [x] Validação completa (state, outputs, S3, DynamoDB, IAM, Lambda invoke)
 - [-] Rede (VPC, subnets) — adiado (Lambda sem VPC no MVP)
 - [-] EKS / ECS — adiado (fase futura, se necessário)
 
@@ -84,9 +85,9 @@ CI / AWS     ░░░░░░░░░░░░░░░░░░░░    0%
 
 ## Próximos passos sugeridos
 
-1. `terraform init` (provider `archive`) + `terraform apply`
-2. Validar Lambda e DynamoDB no LocalStack
-3. Configurar CI com `terraform plan` em PRs
+1. Configurar CI com `terraform plan` em PRs (Fase 4)
+2. API Gateway + rota HTTP para a Lambda
+3. Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`)
 
 ---
 

@@ -56,6 +56,7 @@ echo 'export AWS_SECRET_ACCESS_KEY=test' >> ~/.bashrc
 echo 'export AWS_DEFAULT_REGION=us-east-1' >> ~/.bashrc
 echo 'export AWS_ENDPOINT_URL=http://localhost:4566' >> ~/.bashrc
 ```
+
 Depois: `source ~/.bashrc`
 
 > [!NOTE]
@@ -80,8 +81,9 @@ docker rm -f localstack 2>/dev/null
 
 docker run -d --name localstack \
   -p 4566:4566 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
   -e LOCALSTACK_AUTH_TOKEN="${LOCALSTACK_AUTH_TOKEN}" \
-  -e SERVICES=s3,dynamodb,ec2,iam,sts,eks \
+  -e SERVICES=s3,dynamodb,ec2,iam,sts,eks,lambda,logs \
   localstack/localstack
 ```
 
@@ -152,11 +154,13 @@ terraform validate
 terraform plan
 ```
 
-| Resultado do `plan` | O que fazer |
-|---------------------|-------------|
-| `No changes` | Ambiente alinhado — pode codar |
+
+| Resultado do `plan`     | O que fazer                          |
+| ----------------------- | ------------------------------------ |
+| `No changes`            | Ambiente alinhado — pode codar       |
 | Quer **criar** recursos | LocalStack vazio → `terraform apply` |
-| Erro de backend/state | Ver **Problemas** abaixo |
+| Erro de backend/state   | Ver **Problemas** abaixo             |
+
 
 #### 6c) Aplicar (se o plan mostrar recursos a criar)
 
@@ -168,7 +172,7 @@ terraform apply
 
 ### 7. Validar bucket da aplicação (opcional)
 
-Bucket em `aws-storage.tf`: **`sre-terraform-state`**
+Bucket em `aws-storage.tf`: `**sre-terraform-state**`
 
 ```bash
 aws s3 ls --endpoint-url=http://localhost:4566
@@ -201,13 +205,53 @@ terraform plan   # muitas vezes: No changes
 
 ## Problemas comuns
 
-| Erro | Solução |
-|------|---------|
-| `permission denied` no docker | [adicione docker a groups](https://medium.com/@gildembergleite/como-utilizar-os-comandos-do-docker-sem-o-sudo-no-debian-ubuntu-8c504dfc0b51) |
-| Exit 55 LocalStack | `export LOCALSTACK_AUTH_TOKEN=...` antes do `docker run` |
-| `curl` vazio na 4566 | `docker ps` + `docker logs localstack` |
-| Backend / state não encontrado | Recriar bucket `sre-terraform-state-local` + `terraform init -reconfigure -backend-config=config/backend.local.hcl` |
-| State dessincronizado | `terraform refresh` ou `terraform apply` em dev |
+
+| Erro                           | Solução                                                                                                                                      |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `permission denied` no docker  | [adicione docker a groups](https://medium.com/@gildembergleite/como-utilizar-os-comandos-do-docker-sem-o-sudo-no-debian-ubuntu-8c504dfc0b51) |
+| Exit 55 LocalStack             | `export LOCALSTACK_AUTH_TOKEN=...` antes do `docker run`                                                                                     |
+| `curl` vazio na 4566           | `docker ps` + `docker logs localstack`                                                                                                       |
+| Backend / state não encontrado | Recriar bucket `sre-terraform-state-local` + `terraform init -reconfigure -backend-config=config/backend.local.hcl`                          |
+| State dessincronizado          | `terraform refresh` ou `terraform apply` em dev                                                                                              |
+| Lambda `Docker not available`  | Recriar LocalStack com `-v /var/run/docker.sock:/var/run/docker.sock` (ver abaixo)                                                           |
+
+
+---
+
+## Lambda: `Docker not available`
+
+O LocalStack executa Lambdas criando **containers Docker filhos**. Para isso, o container do LocalStack precisa acessar o Docker do host:
+
+```bash
+-v /var/run/docker.sock:/var/run/docker.sock
+```
+
+Se o `apply` falhar com `Error while creating lambda: Docker not available`:
+
+```bash
+# 1. Recriar LocalStack COM o socket do Docker
+docker rm -f localstack
+
+docker run -d --name localstack \
+  -p 4566:4566 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e LOCALSTACK_AUTH_TOKEN="${LOCALSTACK_AUTH_TOKEN}" \
+  -e SERVICES=s3,dynamodb,ec2,iam,sts,eks,lambda,logs \
+  localstack/localstack
+
+sleep 10
+
+# 2. Recriar bucket de state (se LocalStack perdeu dados)
+export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1
+aws s3 mb s3://sre-terraform-state-local --endpoint-url=http://localhost:4566 2>/dev/null || true
+
+# 3. Reaplicar Terraform (S3/DynamoDB/IAM já podem existir no state)
+cd ~/Claude/projeto-sre/terraform-files
+terraform init -reconfigure -backend-config=config/backend.local.hcl
+terraform apply
+```
+
+> Se a Lambda continuar em estado `Failed`, force recriação: `terraform taint aws_lambda_function.api && terraform apply`
 
 ---
 
@@ -218,9 +262,10 @@ docker rm -f localstack 2>/dev/null
 
 docker run -d --name localstack \
   -p 4566:4566 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
   -v localstack-data:/var/lib/localstack \
   -e LOCALSTACK_AUTH_TOKEN="${LOCALSTACK_AUTH_TOKEN}" \
-  -e SERVICES=s3,dynamodb,ec2,iam,sts,eks \
+  -e SERVICES=s3,dynamodb,ec2,iam,sts,eks,lambda,logs \
   -e PERSISTENCE=1 \
   localstack/localstack
 ```

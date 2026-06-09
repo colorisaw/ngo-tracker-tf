@@ -22,7 +22,7 @@ name_prefix = "${var.project_name}-${var.environment}"
 | `environment` | `dev` | `dev`, `staging`, `prod` |
 | `name_prefix` | (calculado) | `ngo-tracker-dev` |
 
-**Regra de caracteres:** apenas letras minúsculas, números e hífens (`^[a-z][a-z0-9-]*$`), validado em `variables.tf` — exigência de S3 e de vários recursos AWS.
+**Regra de caracteres:** apenas letras minúsculas, números e hífens (`^[a-z][a-z0-9-]*$`), validado em `variables.tf` - exigência de S3 e de vários recursos AWS.
 
 ---
 

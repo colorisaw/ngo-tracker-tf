@@ -4,9 +4,13 @@ data "archive_file" "lambda_api" {
   output_path = "${path.module}/.build/${local.name_prefix}-lambda-api.zip"
 }
 
+# LocalStack: serviço 'logs' costuma estar desligado no SERVICES do container.
+# Na AWS real, o log group explícito controla retenção e naming.
 resource "aws_cloudwatch_log_group" "lambda_api" {
+  count = local.is_localstack ? 0 : 1
+
   name              = "/aws/lambda/${local.name_prefix}-api"
-  retention_in_days = local.is_localstack ? 1 : 14
+  retention_in_days = 14
 
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-api-logs"

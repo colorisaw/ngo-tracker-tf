@@ -42,3 +42,13 @@ output "lambda_api_role_arn" {
   description = "ARN da IAM role de execução da Lambda."
   value       = aws_iam_role.lambda_api.arn
 }
+
+output "api_gateway_url" {
+  description = "URL base da HTTP API (API Gateway v2)."
+  value       = aws_apigatewayv2_stage.default.invoke_url
+}
+
+output "api_gateway_id" {
+  description = "ID da HTTP API."
+  value       = aws_apigatewayv2_api.main.id
+}

@@ -1,4 +1,4 @@
-# Tabela principal — design single-table (PK/SK) para ONGs, doações e metadados
+# Tabela principal - design single-table (PK/SK) para ONGs, doações e metadados
 resource "aws_dynamodb_table" "main" {
   name         = "${local.name_prefix}-main"
   billing_mode = "PAY_PER_REQUEST"

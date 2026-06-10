@@ -1,4 +1,4 @@
-# HTTP API (API Gateway v2) — expõe a Lambda via HTTP
+# HTTP API (API Gateway v2) - expõe a Lambda via HTTP
 resource "aws_apigatewayv2_api" "main" {
   name          = "${local.name_prefix}-http-api"
   protocol_type = "HTTP"

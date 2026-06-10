@@ -1,4 +1,4 @@
-"""Placeholder da API NGO Tracker — substitua pela aplicação real."""
+"""Placeholder da API NGO Tracker - substitua pela aplicação real."""
 
 
 def handler(event, context):

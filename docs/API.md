@@ -9,6 +9,8 @@ API REST da Lambda `ngo-tracker-{env}-api`. Persiste dados no DynamoDB (single-t
 | LocalStack (invoke direto) | N/A — use `aws lambda invoke` com payload HTTP simulado |
 | AWS + API Gateway | `terraform output api_gateway_url` |
 
+Importe a [Postman collection](POSTMAN.md) para testar via HTTP na AWS.
+
 ## Modelo de dados (DynamoDB)
 
 | Entidade | pk | sk | entity_type |

@@ -97,12 +97,13 @@ App (API)    ████████████████░░░░   85%
 - [x] Documentação — [API.md](API.md)
 - [x] `terraform apply` com novo código da Lambda
 - [x] Testes manuais via `aws lambda invoke` (fluxo completo)
+- [x] Postman collection — [POSTMAN.md](POSTMAN.md)
 
 ---
 
 ## Próximos passos sugeridos
 
-1. **Postman collection** — facilitar testes das rotas (LocalStack + AWS)
+1. ~~**Postman collection**~~ — [POSTMAN.md](POSTMAN.md) (`postman/`)
 2. **Deploy AWS real** (`use_localstack = false` + `backend.aws.hcl`) — API Gateway + nuvem
 3. **Frontend** (opcional) — painel para ONGs e doadores
 
@@ -115,5 +116,6 @@ App (API)    ████████████████░░░░   85%
 - [Passo a passo - Rodar localmente](RODAR_LOCALMENTE.md)
 - [Nomenclatura Padrão](NOMENCLATURA_PADRAO.md)
 - [Lambda - API REST](API.md)
+- [Postman collection](POSTMAN.md)
 
 

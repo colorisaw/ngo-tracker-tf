@@ -1,0 +1,433 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "NGO Tracker API",
+    "description": "REST API for NGO audit (donations, expenses, receipts).\n\n**AWS:** import `aws-dev.postman_environment.json`, set `base_url` from `terraform output api_gateway_url`.\n\n**LocalStack:** API Gateway is not available on the free tier — use `aws lambda invoke` (see docs/API.md) or deploy to AWS first.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/dev"
+    },
+    {
+      "key": "ngo_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET / — Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Service ok', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.ok).to.eql(true);",
+                  "    pm.expect(json.service).to.eql('ngo-tracker-api');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NGOs",
+      "item": [
+        {
+          "name": "GET /ngos — List NGOs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/ngos"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has ngos array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('ngos');",
+                  "    pm.expect(json.ngos).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /ngos — Create NGO",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Resgate Patinhas\",\n  \"description\": \"ONG de resgate animal em SP\",\n  \"city\": \"São Paulo\"\n}"
+            },
+            "url": "{{base_url}}/ngos"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test('Returns ngo_id', () => {",
+                  "    pm.expect(json.ngo).to.have.property('ngo_id');",
+                  "});",
+                  "if (json.ngo && json.ngo.ngo_id) {",
+                  "    pm.collectionVariables.set('ngo_id', json.ngo.ngo_id);",
+                  "    if (pm.environment.name) {",
+                  "        pm.environment.set('ngo_id', json.ngo.ngo_id);",
+                  "    }",
+                  "    console.log('ngo_id saved:', json.ngo.ngo_id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /ngos/{id} — NGO profile + summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/ngos/{{ngo_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has summary', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('summary');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "item": [
+        {
+          "name": "GET /ngos/{id}/donations — List donations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/ngos/{{ngo_id}}/donations"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has donations array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.donations).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /ngos/{id}/donations — Register donation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 150.50,\n  \"donor_name\": \"Maria Silva\",\n  \"notes\": \"Doação mensal\"\n}"
+            },
+            "url": "{{base_url}}/ngos/{{ngo_id}}/donations"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns donation', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.donation).to.have.property('donation_id');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        {
+          "name": "GET /ngos/{id}/expenses — List expenses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/ngos/{{ngo_id}}/expenses"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has expenses array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.expenses).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /ngos/{id}/expenses — Register expense",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 89.90,\n  \"category\": \"veterinario\",\n  \"description\": \"Consulta e medicamentos\"\n}"
+            },
+            "url": "{{base_url}}/ngos/{{ngo_id}}/expenses"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns expense', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.expense).to.have.property('expense_id');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Receipts",
+      "item": [
+        {
+          "name": "POST /ngos/{id}/receipts — Upload receipt (base64)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filename\": \"nota-fiscal.txt\",\n  \"content_base64\": \"Y29tcHJvdmFudGUtdGVzdGU=\"\n}"
+            },
+            "url": "{{base_url}}/ngos/{{ngo_id}}/receipts",
+            "description": "Sample base64 decodes to \"comprovante-teste\". Replace with your file's base64 content."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns S3 key', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.receipt).to.have.property('key');",
+                  "    pm.expect(json.receipt).to.have.property('bucket');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flow — Full audit (run in order)",
+      "description": "Run this folder with Collection Runner. Execute **Create NGO** first so `ngo_id` is set automatically.",
+      "item": [
+        {
+          "name": "1. Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Create NGO",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Resgate Patinhas\",\n  \"description\": \"Fluxo Postman\",\n  \"city\": \"SP\"\n}"
+            },
+            "url": "{{base_url}}/ngos"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.ngo && json.ngo.ngo_id) {",
+                  "    pm.collectionVariables.set('ngo_id', json.ngo.ngo_id);",
+                  "    if (pm.environment.name) pm.environment.set('ngo_id', json.ngo.ngo_id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Register donation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 200,\n  \"donor_name\": \"João\",\n  \"notes\": \"Postman flow\"\n}"
+            },
+            "url": "{{base_url}}/ngos/{{ngo_id}}/donations"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Register expense",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 75,\n  \"category\": \"racao\",\n  \"description\": \"Ração 15kg\"\n}"
+            },
+            "url": "{{base_url}}/ngos/{{ngo_id}}/expenses"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Upload receipt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filename\": \"recibo.txt\",\n  \"content_base64\": \"Y29tcHJvdmFudGUtdGVzdGU=\"\n}"
+            },
+            "url": "{{base_url}}/ngos/{{ngo_id}}/receipts"
+          },
+          "response": []
+        },
+        {
+          "name": "6. Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/ngos/{{ngo_id}}"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Summary has balance', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.summary).to.have.property('balance');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

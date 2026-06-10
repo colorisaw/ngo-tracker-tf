@@ -179,6 +179,18 @@ GitHub → **Actions** → workflow **Terraform CI** → jobs verdes.
 - `plan` em PR mostra impacto antes do merge
 - Demonstra prática SRE/DevOps no portfólio
 
+### Segurança: credenciais nos logs do CI
+
+| Valor | O que é | Usar GitHub Secret? |
+|-------|---------|---------------------|
+| `AWS_ACCESS_KEY_ID=test` | Credencial **dummy** do LocalStack (documentação pública) | **Não** — não protege nada e dá falsa sensação de segurança |
+| `AWS_SECRET_ACCESS_KEY=test` | Idem | **Não** |
+| `LOCALSTACK_AUTH_TOKEN` | Token **real** da sua conta LocalStack | **Sim** — único secret necessário |
+
+O workflow define `test`/`test` no bloco `env:` global (não no script `run:`), para os logs não repetirem `export AWS_ACCESS_KEY_ID=test...`. O bootstrap usa `./scripts/bootstrap-localstack.sh`, que lê essas ENVs.
+
+**Quando for AWS real:** use secrets `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (ou OIDC) — nunca commite credenciais reais.
+
 ---
 
 ## Passo 5 - AWS real (quando for deploy)

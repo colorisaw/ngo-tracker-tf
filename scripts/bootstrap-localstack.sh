@@ -24,7 +24,7 @@ aws s3 mb "s3://${BUCKET}" --endpoint-url="$ENDPOINT" 2>/dev/null || true
 if aws s3 ls "s3://${BUCKET}" --endpoint-url="$ENDPOINT" >/dev/null; then
   echo "✓ Bucket $BUCKET pronto"
 else
-  echo "Erro: não foi possível confirmar o bucket $BUCKET",
+  echo "Erro: não foi possível confirmar o bucket $BUCKET"
   echo "Verifique se o bucket existe e se tem permissões para acesso"
   echo "Consulte a documentação para mais detalhes > docs/RODAR_LOCALMENTE.md"
   exit 1

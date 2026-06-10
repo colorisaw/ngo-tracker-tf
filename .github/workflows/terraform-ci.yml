@@ -10,8 +10,6 @@ permissions:
 
 env:
   TF_VERSION: "1.15.5"
-  # Credenciais dummy do LocalStack (documentação oficial) — NÃO são credenciais AWS reais.
-  # Não use GitHub Secrets para estes valores; não há risco de vazamento de conta AWS.
   AWS_ACCESS_KEY_ID: test
   AWS_SECRET_ACCESS_KEY: test
   AWS_DEFAULT_REGION: us-east-1

@@ -1,5 +1,3 @@
-# LocalStack para desenvolvimento (FinOps - custo zero)
-# Uso: export LOCALSTACK_AUTH_TOKEN=ls-... && docker compose up -d
 services:
   localstack:
     container_name: localstack

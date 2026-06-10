@@ -1,4 +1,3 @@
-# Bucket de dados da aplicação (relatórios, anexos, exports)
 resource "aws_s3_bucket" "app_data" {
   bucket = "${local.name_prefix}-data"
 

@@ -1,4 +1,3 @@
-# Role de execução da API Lambda
 resource "aws_iam_role" "lambda_api" {
   name = "${local.name_prefix}-lambda-api"
 

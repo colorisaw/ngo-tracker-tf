@@ -1,5 +1,3 @@
-# HTTP API (API Gateway v2) — apenas na AWS real.
-# LocalStack free: apigatewayv2 exige licença paga. Em dev local, use `aws lambda invoke`.
 resource "aws_apigatewayv2_api" "main" {
   count = local.create_api_gateway ? 1 : 0
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Bootstrap do bucket S3 de state no LocalStack
 set -euo pipefail
 
 ENDPOINT="${AWS_ENDPOINT_URL:-http://localhost:4566}"

@@ -15,7 +15,7 @@ Guia para rodar a partir do repositório `terraform-files` em sua máquina local
 2. Definir variáveis de ambiente (AWS CLI + token LocalStack)
 3. Subir LocalStack (Docker)
 4. Health check
-5. Bootstrap S3 (backend) — se LocalStack estiver “vazio”
+5. Bootstrap S3 (backend) - se LocalStack estiver “vazio”
 6. Terraform (init se precisar → validate → plan → apply)
 7. Validar recursos (state, outputs, AWS CLI, invoke Lambda)
 ```
@@ -43,7 +43,7 @@ export AWS_SECRET_ACCESS_KEY=test
 export AWS_DEFAULT_REGION=us-east-1
 export AWS_ENDPOINT_URL=http://localhost:4566 #pode trocar a porta se quiser
 
-# Token LocalStack (substitua pelo seu — ou tenha no ~/.bashrc)
+# Token LocalStack (substitua pelo seu - ou tenha no ~/.bashrc)
 export LOCALSTACK_AUTH_TOKEN="ls-SEU_TOKEN_AQUI"
 ```
 
@@ -157,7 +157,7 @@ terraform plan
 
 | Resultado do `plan`     | O que fazer                          |
 | ----------------------- | ------------------------------------ |
-| `No changes`            | Ambiente alinhado — pode codar       |
+| `No changes`            | Ambiente alinhado - pode codar       |
 | Quer **criar** recursos | LocalStack vazio → `terraform apply` |
 | Erro de backend/state   | Ver **Problemas** abaixo             |
 
@@ -183,14 +183,14 @@ export AWS_DEFAULT_REGION=us-east-1
 export LS=http://localhost:4566
 ```
 
-#### 7b) Terraform — state e outputs
+#### 7b) Terraform - state e outputs
 
 ```bash
 terraform state list
 terraform output
 ```
 
-**`terraform state list` — 9 itens esperados:**
+**`terraform state list` - 9 itens esperados:**
 
 ```text
 data.archive_file.lambda_api          # zip local da Lambda (não é recurso AWS)
@@ -206,7 +206,7 @@ aws_s3_bucket_versioning.app_data
 
 > `data.archive_file.lambda_api` é normal: empacota `lambda/handler.py` antes do deploy.
 
-**`terraform output` — 9 valores esperados:**
+**`terraform output` - 9 valores esperados:**
 
 | Output | Exemplo em `dev` |
 |--------|------------------|
@@ -222,7 +222,7 @@ aws_s3_bucket_versioning.app_data
 
 Outputs com sufixo `_arn` são intencionais (IAM, CI, integrações).
 
-#### 7c) S3 — bucket de dados
+#### 7c) S3 - bucket de dados
 
 ```bash
 aws s3 ls --endpoint-url=$LS | grep ngo-tracker
@@ -234,7 +234,7 @@ aws s3 cp /tmp/teste-ngo.txt s3://ngo-tracker-dev-data/validacao/teste.txt --end
 aws s3 ls s3://ngo-tracker-dev-data/validacao/ --endpoint-url=$LS
 ```
 
-#### 7d) DynamoDB — tabela principal
+#### 7d) DynamoDB - tabela principal
 
 ```bash
 aws dynamodb describe-table \
@@ -245,7 +245,7 @@ aws dynamodb describe-table \
 
 Esperado: `Status: ACTIVE`, chaves `pk` e `sk`.
 
-#### 7e) IAM — role da Lambda
+#### 7e) IAM - role da Lambda
 
 ```bash
 aws iam get-role \
@@ -254,7 +254,7 @@ aws iam get-role \
   --query 'Role.{Name:RoleName,Arn:Arn}'
 ```
 
-#### 7f) Lambda — invoke
+#### 7f) Lambda - invoke
 
 ```bash
 aws lambda get-function \

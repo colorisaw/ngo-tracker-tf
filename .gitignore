@@ -39,3 +39,4 @@ Thumbs.db
 # LocalStack
 localstack-data/
 volume/
+.env.localstack

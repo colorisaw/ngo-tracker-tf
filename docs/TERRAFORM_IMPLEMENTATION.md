@@ -1,6 +1,6 @@
 # Resumo do que foi feito (e porquê)
 
-Projeto: **ngo-tracker-tf** — infraestrutura como código com Terraform e emulação local (decisão de FinOps para evitar gastos desnecessários).
+Projeto: **ngo-tracker-tf** - infraestrutura como código com Terraform e emulação local (decisão de FinOps para evitar gastos desnecessários).
 
 ---
 

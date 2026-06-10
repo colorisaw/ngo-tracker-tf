@@ -7,7 +7,7 @@ Arquitetura **serverless** para o NGO Tracker (adequada ao LocalStack e à AWS r
 ## Índice
 
 1. [Visão geral da arquitetura](#visão-geral-da-arquitetura)
-2. [Decisões técnicas — por mudança](#decisões-técnicas--por-mudança)
+2. [Decisões técnicas - por mudança](#decisões-técnicas--por-mudança)
 3. [Recursos criados](#recursos-criados)
 4. [Modelo de dados DynamoDB](#modelo-de-dados-dynamodb)
 5. [O que foi adiado e por quê](#o-que-foi-adiado-e-por-quê)
@@ -46,11 +46,11 @@ A API (hoje um placeholder em Python) é o ponto central: lê/escreve auditoria 
 
 ---
 
-## Decisões técnicas — por mudança
+## Decisões técnicas - por mudança
 
 ### 1. Arquitetura serverless (Lambda + DynamoDB + S3)
 
-**O quê:** Compute via Lambda, dados em DynamoDB e arquivos em S3 — sem servidores EC2 nem cluster Kubernetes nesta fase.
+**O quê:** Compute via Lambda, dados em DynamoDB e arquivos em S3 - sem servidores EC2 nem cluster Kubernetes nesta fase.
 
 **Por quê:**
 
@@ -60,7 +60,7 @@ A API (hoje um placeholder em Python) é o ponto central: lê/escreve auditoria 
 | Complexidade | Menos peças para aprender e manter no portfólio | VPC, nodes, ingress, mais moving parts |
 | Caso de uso NGO Tracker | API com picos moderados, CRUD + uploads | EKS só se houver microsserviços pesados ou estado em memória |
 
-**Trade-off aceito:** limite de tempo/memória da Lambda e cold start — aceitável para API de auditoria e MVP.
+**Trade-off aceito:** limite de tempo/memória da Lambda e cold start - aceitável para API de auditoria e MVP.
 
 ---
 
@@ -74,7 +74,7 @@ A API (hoje um placeholder em Python) é o ponto central: lê/escreve auditoria 
 - Naming genérico não escalava para `staging` / `prod` nem identificava o produto.
 - Separar arquivos por domínio (`storage.tf`, `dynamodb.tf`, …) é padrão Terraform: cada arquivo = um bounded context, reviews e `plan` mais legíveis.
 
-**Impacto no `apply`:** se o bucket antigo ainda estiver no state, o Terraform propõe **destroy** do recurso antigo e **create** do novo — correto em `dev`; em produção exigiria migração de objetos antes.
+**Impacto no `apply`:** se o bucket antigo ainda estiver no state, o Terraform propõe **destroy** do recurso antigo e **create** do novo - correto em `dev`; em produção exigiria migração de objetos antes.
 
 ---
 
@@ -92,7 +92,7 @@ name_prefix = "${var.project_name}-${var.environment}"
 - **Um único lugar** para mudar o prefixo de todos os recursos (`ngo-tracker` → outro nome de produto).
 - **`environment`** no nome evita colisão entre `dev`, `staging` e `prod` na mesma conta AWS.
 - Convenção `{projeto}-{ambiente}-{função}` é reconhecida em FinOps (cost allocation) e em buscas no console AWS.
-- Validação regex em `project_name` / `environment`: S3 e vários recursos AWS **exigem nomes em minúsculas** sem caracteres especiais — falhar no `plan` é melhor que falhar no `apply`.
+- Validação regex em `project_name` / `environment`: S3 e vários recursos AWS **exigem nomes em minúsculas** sem caracteres especiais - falhar no `plan` é melhor que falhar no `apply`.
 
 **Tags:** `Project = local.project_name` (antes `sre-terraform`) alinha custos e inventário ao produto real **ngo-tracker**.
 
@@ -111,11 +111,11 @@ name_prefix = "${var.project_name}-${var.environment}"
 | Reuso futuro | Módulos podem extrair `storage.tf` inteiro depois |
 | Blast radius | Erro de sintaxe em `lambda.tf` não mistura com DynamoDB no diff |
 
-Não criamos **módulos Terraform** ainda — YAGNI: o root module ainda é pequeno; módulos entram quando houver segundo ambiente ou repetição.
+Não criamos **módulos Terraform** ainda - YAGNI: o root module ainda é pequeno; módulos entram quando houver segundo ambiente ou repetição.
 
 ---
 
-### 5. S3 — `storage.tf`
+### 5. S3 - `storage.tf`
 
 #### 5.1 Bucket `${name_prefix}-data`
 
@@ -125,7 +125,7 @@ Não criamos **módulos Terraform** ainda — YAGNI: o root module ainda é pequ
 
 #### 5.2 Versioning habilitado
 
-**Por quê:** auditoria de ONGs exige **rastreabilidade** — versioning permite recuperar versão anterior de um comprovante se alguém sobrescrever por engano.
+**Por quê:** auditoria de ONGs exige **rastreabilidade** - versioning permite recuperar versão anterior de um comprovante se alguém sobrescrever por engano.
 
 **Trade-off:** mais storage; em `dev` no LocalStack o impacto é irrelevante.
 
@@ -139,7 +139,7 @@ Não criamos **módulos Terraform** ainda — YAGNI: o root module ainda é pequ
 
 ---
 
-### 6. DynamoDB — `dynamodb.tf`
+### 6. DynamoDB - `dynamodb.tf`
 
 #### 6.1 Single-table design (pk + sk)
 
@@ -147,7 +147,7 @@ Não criamos **módulos Terraform** ainda — YAGNI: o root module ainda é pequ
 
 **Por quê:**
 
-- NGO Tracker tem várias entidades (ONG, doação, gasto, usuário) — multi-table exige joins que DynamoDB não tem.
+- NGO Tracker tem várias entidades (ONG, doação, gasto, usuário) - multi-table exige joins que DynamoDB não tem.
 - **Single-table** permite transações e queries relacionais com padrões `PK/SK` (ex.: `NGO#123` + `METADATA`, `NGO#123` + `DONATION#456`).
 - Padrão recomendado pela AWS para aplicações DynamoDB-first; escala com GSI sem proliferar tabelas.
 
@@ -163,15 +163,15 @@ Não criamos **módulos Terraform** ainda — YAGNI: o root module ainda é pequ
 
 **Por quê:**
 
-- MVP e `dev`: tráfego imprevisível e baixo — **on-demand** evita provisionar RCU/WCU.
+- MVP e `dev`: tráfego imprevisível e baixo - **on-demand** evita provisionar RCU/WCU.
 - LocalStack não cobra; na AWS real você não paga capacidade ociosa.
-- **Trade-off:** em tráfego alto e estável, provisioned pode ser mais barato — reavaliar em produção.
+- **Trade-off:** em tráfego alto e estável, provisioned pode ser mais barato - reavaliar em produção.
 
 #### 6.3 GSI `entity-type-index` (entity_type + sk)
 
-**Por quê:** listar “todas as ONGs” ou “todas as doações” sem `Scan` na tabela inteira. O GSI projeta `entity_type` como hash — query eficiente por tipo.
+**Por quê:** listar “todas as ONGs” ou “todas as doações” sem `Scan` na tabela inteira. O GSI projeta `entity_type` como hash - query eficiente por tipo.
 
-**`projection_type = ALL`:** queries no índice trazem o item completo — mais storage no índice, menos chamadas subsequentes à tabela base (simplicidade no app).
+**`projection_type = ALL`:** queries no índice trazem o item completo - mais storage no índice, menos chamadas subsequentes à tabela base (simplicidade no app).
 
 #### 6.4 `point_in_time_recovery` condicional
 
@@ -181,20 +181,20 @@ enabled = !local.is_localstack
 
 **Por quê:**
 
-- Na **AWS real:** PITR permite restaurar tabela a um instante no tempo — importante para dados de auditoria.
-- No **LocalStack:** suporte limitado ou desnecessário em dev — desligado evita erro ou comportamento inconsistente no emulador.
+- Na **AWS real:** PITR permite restaurar tabela a um instante no tempo - importante para dados de auditoria.
+- No **LocalStack:** suporte limitado ou desnecessário em dev - desligado evita erro ou comportamento inconsistente no emulador.
 
 ---
 
-### 7. IAM — `iam.tf`
+### 7. IAM - `iam.tf`
 
 #### 7.1 Role dedicada `lambda-api` (não usar role default)
 
-**Por quê:** **least privilege** — a Lambda só recebe permissões para a tabela e o bucket que o código usa, não `AdministratorAccess`.
+**Por quê:** **least privilege** - a Lambda só recebe permissões para a tabela e o bucket que o código usa, não `AdministratorAccess`.
 
 #### 7.2 `assume_role_policy` para `lambda.amazonaws.com`
 
-**Por quê:** contrato AWS — só o serviço Lambda pode assumir essa role em runtime.
+**Por quê:** contrato AWS - só o serviço Lambda pode assumir essa role em runtime.
 
 #### 7.3 Policy inline (`aws_iam_role_policy`) vs policy attachment gerenciada
 
@@ -202,20 +202,20 @@ enabled = !local.is_localstack
 
 **Por quê:**
 
-- ARNs são **derivados do state** — se o bucket mudar, a policy acompanha no mesmo `apply`.
+- ARNs são **derivados do state** - se o bucket mudar, a policy acompanha no mesmo `apply`.
 - Policies AWS gerenciadas (`AmazonDynamoDBFullAccess`) são amplas demais para portfólio que prega segurança.
 
-**Permissões DynamoDB:** CRUD + Query/Scan + Batch na tabela **e** `index/*` — necessário para o GSI.
+**Permissões DynamoDB:** CRUD + Query/Scan + Batch na tabela **e** `index/*` - necessário para o GSI.
 
-**Permissões S3:** `Get/Put/Delete Object` + `ListBucket` — upload de comprovantes e listagem de prefixos.
+**Permissões S3:** `Get/Put/Delete Object` + `ListBucket` - upload de comprovantes e listagem de prefixos.
 
 **Permissões Logs:** Lambda precisa escrever em CloudWatch; sem isso a função executa mas você fica “cego” em debug.
 
-**O que não colocamos ainda:** `kms:Decrypt`, `ses:SendEmail`, `sns:Publish` — só quando a aplicação precisar.
+**O que não colocamos ainda:** `kms:Decrypt`, `ses:SendEmail`, `sns:Publish` - só quando a aplicação precisar.
 
 ---
 
-### 8. Lambda — `lambda.tf` e `lambda/handler.py`
+### 8. Lambda - `lambda.tf` e `lambda/handler.py`
 
 #### 8.1 Runtime `python3.12`
 
@@ -238,7 +238,7 @@ Substituir depois por FastAPI/Flask em layer ou container image sem mudar a role
 
 **Por quê:** Lambda exige pacote zip; gerar no `plan/apply` garante que **código alterado → novo hash → update da função** (`source_code_hash`).
 
-**Alternativa rejeitada:** zip commitado no Git — polui diff e esquece rebuild.
+**Alternativa rejeitada:** zip commitado no Git - polui diff e esquece rebuild.
 
 #### 8.4 Variáveis de ambiente na Lambda
 
@@ -264,7 +264,7 @@ Substituir depois por FastAPI/Flask em layer ou container image sem mudar a role
 
 #### 8.7 Provider `archive` em `versions.tf`
 
-**Por quê:** provider oficial HashiCorp para zip; `terraform init` versiona junto com `.terraform.lock.hcl` — reprodutibilidade para o time e CI.
+**Por quê:** provider oficial HashiCorp para zip; `terraform init` versiona junto com `.terraform.lock.hcl` - reprodutibilidade para o time e CI.
 
 ---
 
@@ -287,7 +287,7 @@ Substituir depois por FastAPI/Flask em layer ou container image sem mudar a role
 | Item | Motivo |
 |------|--------|
 | `providers.tf` / LocalStack | FinOps intacto; Fase 3 reusa a mesma estratégia |
-| `backend.local.hcl` | State continua em `sre-terraform-state-local` — separado dos dados da app |
+| `backend.local.hcl` | State continua em `sre-terraform-state-local` - separado dos dados da app |
 | API Gateway | Camada HTTP pública fica para fase 4; reduz superfície no primeiro `apply` |
 | VPC + Lambda em subnet privada | Complexidade e NAT cost; desnecessário sem RDS/EKS |
 | KMS customer-managed | SSE-S3 basta no MVP; KMS entra se compliance exigir |
@@ -303,7 +303,7 @@ Substituir depois por FastAPI/Flask em layer ou container image sem mudar a role
 | DynamoDB (single-table) | `dynamodb.tf` | `ngo-tracker-dev-main` |
 | IAM role (Lambda) | `iam.tf` | `ngo-tracker-dev-lambda-api` |
 | Lambda (API placeholder) | `lambda.tf` | `ngo-tracker-dev-api` |
-| Outputs | `outputs.tf` | — |
+| Outputs | `outputs.tf` | - |
 
 ---
 
@@ -311,8 +311,8 @@ Substituir depois por FastAPI/Flask em layer ou container image sem mudar a role
 
 Chaves:
 
-- **pk** (hash) — ex.: `NGO#<id>`, `DONATION#<id>`
-- **sk** (range) — metadado ou relação
+- **pk** (hash) - ex.: `NGO#<id>`, `DONATION#<id>`
+- **sk** (range) - metadado ou relação
 
 **GSI** `entity-type-index`: consultas por `entity_type` (ex.: listar todas as ONGs).
 
@@ -324,14 +324,14 @@ Variáveis de ambiente na Lambda: `DYNAMODB_TABLE`, `S3_BUCKET`, `ENVIRONMENT`.
 
 ### VPC / subnets
 
-- Lambda **fora de VPC** usa serviços AWS (DynamoDB, S3) via rede gerenciada da AWS — sem ENI, sem cold start extra.
+- Lambda **fora de VPC** usa serviços AWS (DynamoDB, S3) via rede gerenciada da AWS - sem ENI, sem cold start extra.
 - VPC só é necessária para acessar **RDS, ElastiCache, recursos em IP privado**.
-- LocalStack simula VPC de forma parcial — adiar reduz fricção no dev.
+- LocalStack simula VPC de forma parcial - adiar reduz fricção no dev.
 
 ### EKS / ECS
 
 - Orquestração de containers justifica-se com muitos serviços, tráfego estável e equipe dedicada a Kubernetes.
-- NGO Tracker MVP = API + dados — Lambda cobre com menos custo operacional.
+- NGO Tracker MVP = API + dados - Lambda cobre com menos custo operacional.
 
 ### API Gateway
 

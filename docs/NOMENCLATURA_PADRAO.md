@@ -45,11 +45,11 @@ Padrão: **`${local.name_prefix}-<sufixo>`**
 
 | Serviço | Nome em `dev` | Arquivo | Sufixo / função |
 |---------|---------------|---------|-----------------|
-| S3 (dados) | `ngo-tracker-dev-data` | `storage.tf` | `-data` — anexos, relatórios, exports |
-| DynamoDB | `ngo-tracker-dev-main` | `dynamodb.tf` | `-main` — tabela single-table |
-| IAM role | `ngo-tracker-dev-lambda-api` | `iam.tf` | `-lambda-api` — execução da API |
+| S3 (dados) | `ngo-tracker-dev-data` | `storage.tf` | `-data` - anexos, relatórios, exports |
+| DynamoDB | `ngo-tracker-dev-main` | `dynamodb.tf` | `-main` - tabela single-table |
+| IAM role | `ngo-tracker-dev-lambda-api` | `iam.tf` | `-lambda-api` - execução da API |
 | IAM policy | `ngo-tracker-dev-lambda-api` | `iam.tf` | mesmo nome da role (inline) |
-| Lambda | `ngo-tracker-dev-api` | `lambda.tf` | `-api` — função HTTP/API |
+| Lambda | `ngo-tracker-dev-api` | `lambda.tf` | `-api` - função HTTP/API |
 | CloudWatch Logs | `/aws/lambda/ngo-tracker-dev-api` | `lambda.tf` | path padrão AWS + `name_prefix` |
 | GSI DynamoDB | `entity-type-index` | `dynamodb.tf` | kebab-case, descreve o índice |
 
@@ -63,9 +63,9 @@ Padrão: **`${local.name_prefix}-<sufixo>`**
 
 ---
 
-## Backend Terraform (state) — naming separado
+## Backend Terraform (state) - naming separado
 
-O **state** não usa `name_prefix` da aplicação — evita misturar infra de controle com dados do produto.
+O **state** não usa `name_prefix` da aplicação - evita misturar infra de controle com dados do produto.
 
 | Contexto | Bucket S3 (state) | Key do state |
 |----------|-------------------|--------------|
@@ -96,7 +96,7 @@ Um domínio por arquivo, em **snake_case** descritivo:
 
 ### Blocos `resource`
 
-Formato: `resource "aws_<tipo>" "<nome_lógico>"` — **snake_case**, curto, papel do recurso:
+Formato: `resource "aws_<tipo>" "<nome_lógico>"` - **snake_case**, curto, papel do recurso:
 
 | Recurso lógico | Tipo AWS |
 |----------------|----------|

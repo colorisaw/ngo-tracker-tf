@@ -8,7 +8,7 @@ services:
       - "4566:4566"
     environment:
       LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:?Defina LOCALSTACK_AUTH_TOKEN antes de subir}
-      SERVICES: s3,dynamodb,ec2,iam,sts,lambda,logs,apigateway,apigatewayv2
+      SERVICES: s3,dynamodb,ec2,iam,sts,lambda,logs
       PERSISTENCE: "1"
       DEBUG: ${DEBUG:-0}
     volumes:

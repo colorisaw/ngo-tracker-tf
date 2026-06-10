@@ -1,6 +1,9 @@
 locals {
   is_localstack = var.use_localstack
 
+  # API Gateway v2 não está na licença free do LocalStack — só provisiona na AWS real.
+  create_api_gateway = !local.is_localstack
+
   project_name = var.project_name
   name_prefix  = "${local.project_name}-${var.environment}"
 

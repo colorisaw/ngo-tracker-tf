@@ -48,7 +48,7 @@ jobs:
             -p 4566:4566 \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -e LOCALSTACK_AUTH_TOKEN="${LOCALSTACK_AUTH_TOKEN}" \
-            -e SERVICES=s3,dynamodb,iam,sts,lambda,logs,apigateway,apigatewayv2 \
+            -e SERVICES=s3,dynamodb,iam,sts,lambda,logs \
             localstack/localstack
           sleep 15
           curl -sf http://localhost:4566/_localstack/health

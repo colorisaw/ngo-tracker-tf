@@ -1,5 +1,8 @@
-# HTTP API (API Gateway v2) - expõe a Lambda via HTTP
+# HTTP API (API Gateway v2) — apenas na AWS real.
+# LocalStack free: apigatewayv2 exige licença paga. Em dev local, use `aws lambda invoke`.
 resource "aws_apigatewayv2_api" "main" {
+  count = local.create_api_gateway ? 1 : 0
+
   name          = "${local.name_prefix}-http-api"
   protocol_type = "HTTP"
 
@@ -9,7 +12,9 @@ resource "aws_apigatewayv2_api" "main" {
 }
 
 resource "aws_apigatewayv2_integration" "lambda" {
-  api_id                 = aws_apigatewayv2_api.main.id
+  count = local.create_api_gateway ? 1 : 0
+
+  api_id                 = aws_apigatewayv2_api.main[0].id
   integration_type       = "AWS_PROXY"
   integration_uri        = aws_lambda_function.api.invoke_arn
   integration_method     = "POST"
@@ -17,19 +22,25 @@ resource "aws_apigatewayv2_integration" "lambda" {
 }
 
 resource "aws_apigatewayv2_route" "proxy" {
-  api_id    = aws_apigatewayv2_api.main.id
+  count = local.create_api_gateway ? 1 : 0
+
+  api_id    = aws_apigatewayv2_api.main[0].id
   route_key = "ANY /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda[0].id}"
 }
 
 resource "aws_apigatewayv2_route" "root" {
-  api_id    = aws_apigatewayv2_api.main.id
+  count = local.create_api_gateway ? 1 : 0
+
+  api_id    = aws_apigatewayv2_api.main[0].id
   route_key = "ANY /"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda[0].id}"
 }
 
 resource "aws_apigatewayv2_stage" "default" {
-  api_id      = aws_apigatewayv2_api.main.id
+  count = local.create_api_gateway ? 1 : 0
+
+  api_id      = aws_apigatewayv2_api.main[0].id
   name        = var.environment
   auto_deploy = true
 
@@ -39,9 +50,11 @@ resource "aws_apigatewayv2_stage" "default" {
 }
 
 resource "aws_lambda_permission" "api_gateway" {
+  count = local.create_api_gateway ? 1 : 0
+
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.main.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.main[0].execution_arn}/*/*"
 }

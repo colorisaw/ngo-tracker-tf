@@ -103,48 +103,46 @@ terraform apply
 
 ---
 
-## Passo 3 - API Gateway (HTTP)
+## Passo 3 — API Gateway (HTTP) e teste local
 
-Novo arquivo `api_gateway.tf` cria HTTP API (v2) com rotas `ANY /` e `ANY /{proxy+}` apontando para a Lambda.
+### LocalStack (licença free): **sem** API Gateway
 
-### 3.1 Apply
+O serviço `apigatewayv2` **não está incluído** na licença gratuita do LocalStack. Por isso, com `use_localstack = true`, o Terraform **não cria** recursos de API Gateway (`local.create_api_gateway = false`).
 
-```bash
-terraform plan   # deve mostrar recursos aws_apigatewayv2_*
-terraform apply
-```
-
-### 3.2 URL da API
+**Como testar a API localmente:** invoque a Lambda diretamente:
 
 ```bash
-terraform output api_gateway_url
-```
+export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1
 
-Exemplo LocalStack: `https://xxxx.execute-api.us-east-1.amazonaws.com/dev`  
-(No LocalStack a URL pode usar host `localhost:4566` - teste com `curl` abaixo.)
+aws lambda invoke \
+  --function-name ngo-tracker-dev-api \
+  --endpoint-url=http://localhost:4566 \
+  --cli-binary-format raw-in-base64-out \
+  /tmp/lambda-out.json
 
-### 3.3 Testar HTTP
-
-```bash
-API_URL=$(terraform output -raw api_gateway_url)
-curl -s "${API_URL}/" | python3 -m json.tool
-```
-
-Alternativa no LocalStack (se a URL acima não responder):
-
-```bash
-# Obter API ID
-API_ID=$(terraform output -raw api_gateway_id)
-curl -s "http://localhost:4566/restapis/${API_ID}/dev/_user_request_/"
+cat /tmp/lambda-out.json
 ```
 
 Esperado: JSON com `"ok": true`.
 
-### Por quê API Gateway?
+`terraform output api_gateway_url` retorna `null` no LocalStack — isso é **esperado**.
 
-- Expõe a Lambda via HTTP (seja para browser, Postman, frontend etc.)
+### AWS real: API Gateway habilitado
+
+Com `use_localstack = false`, o `apply` cria HTTP API (v2) com rotas `ANY /` e `ANY /{proxy+}` → Lambda.
+
+```bash
+terraform plan   # mostra aws_apigatewayv2_* apenas com use_localstack = false
+terraform apply
+terraform output api_gateway_url
+curl -s "$(terraform output -raw api_gateway_url)/"
+```
+
+### Por quê API Gateway na AWS?
+
+- Expõe a Lambda via HTTP (browser, Postman, frontend)
 - Padrão serverless na AWS
-- Completa o diagrama de arquitetura do README
+- Código já pronto em `api_gateway.tf`; só provisiona onde a licença/serviço existe
 
 ---
 
@@ -231,34 +229,36 @@ terraform apply
 
 ## Validação da Fase 4
 
-Checklist rápido:
+### LocalStack (dev)
 
 ```bash
-# Compose
 docker compose ps
-
-# Bootstrap
 ./scripts/bootstrap-localstack.sh
+terraform apply
 
-# Terraform
-terraform output api_gateway_url
-terraform state list | grep apigateway
+# Lambda (substitui API Gateway na licença free)
+aws lambda invoke \
+  --function-name ngo-tracker-dev-api \
+  --endpoint-url=http://localhost:4566 \
+  --cli-binary-format raw-in-base64-out /tmp/out.json && cat /tmp/out.json
 
-# HTTP
-API_URL=$(terraform output -raw api_gateway_url)
-curl -s "${API_URL}/"
-
-# CI
-# → GitHub Actions verde no último push/PR
+terraform output api_gateway_url   # esperado: null
 ```
 
 | Item | OK se… |
 |------|--------|
 | Docker Compose | `docker compose ps` → `Up` |
 | Bootstrap | script retorna ✓ |
-| API Gateway | `terraform output api_gateway_url` preenchido |
+| Lambda | invoke retorna `"ok": true` |
+| API Gateway | `api_gateway_url` = `null` (normal no LocalStack) |
 | CI fmt/validate | job verde no GitHub |
-| CI plan | job verde (com secret configurado) |
+
+### AWS real (quando fizer deploy)
+
+| Item | OK se… |
+|------|--------|
+| API Gateway | `terraform output api_gateway_url` preenchido |
+| HTTP | `curl` na URL retorna JSON da API |
 
 ---
 
@@ -268,7 +268,7 @@ curl -s "${API_URL}/"
 |----------|---------|
 | `Defina LOCALSTACK_AUTH_TOKEN` no compose | `export LOCALSTACK_AUTH_TOKEN=ls-...` antes de `docker compose up` |
 | Lambda `Docker not available` | Compose já monta `/var/run/docker.sock` - recrie: `docker compose down && docker compose up -d` |
-| API Gateway 404 no LocalStack | Use URL `http://localhost:4566/restapis/{id}/dev/_user_request_/` |
+| API Gateway 404 / licença LocalStack | Normal na licença free — use `aws lambda invoke`; API GW só na AWS real |
 | CI plan não roda | Adicione secret `LOCALSTACK_AUTH_TOKEN` no GitHub |
 | `fmt` falha no CI | Rode `terraform fmt -recursive` localmente e commit |
 

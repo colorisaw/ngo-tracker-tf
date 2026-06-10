@@ -68,9 +68,9 @@ Ops / CI     ████████████████░░░░   80%
 - [x] Script `scripts/bootstrap-localstack.sh`
 - [x] Volume persistente (`PERSISTENCE=1` no compose)
 - [x] CI GitHub Actions (`fmt`, `validate`, `plan` opcional com LocalStack)
-- [x] API Gateway HTTP + rota para Lambda (`api_gateway.tf`)
+- [x] API Gateway HTTP (`api_gateway.tf`) — **somente AWS real** (LocalStack free não inclui apigatewayv2)
 - [x] Documentação - [OPERACAO_E_QUALIDADE.md](OPERACAO_E_QUALIDADE.md)
-- [ ] `terraform apply` da Fase 4 no LocalStack (API Gateway)
+- [ ] `terraform apply` da Fase 4 no LocalStack (sem API Gateway; validar Lambda invoke)
 - [ ] Secret `LOCALSTACK_AUTH_TOKEN` configurado no GitHub
 - [ ] CI verde no repositório remoto
 - [ ] Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`) - quando decidir deploy

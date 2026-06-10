@@ -44,11 +44,11 @@ output "lambda_api_role_arn" {
 }
 
 output "api_gateway_url" {
-  description = "URL base da HTTP API (API Gateway v2)."
-  value       = aws_apigatewayv2_stage.default.invoke_url
+  description = "URL da HTTP API (null no LocalStack — licença free não inclui apigatewayv2)."
+  value       = local.create_api_gateway ? aws_apigatewayv2_stage.default[0].invoke_url : null
 }
 
 output "api_gateway_id" {
-  description = "ID da HTTP API."
-  value       = aws_apigatewayv2_api.main.id
+  description = "ID da HTTP API (null no LocalStack)."
+  value       = local.create_api_gateway ? aws_apigatewayv2_api.main[0].id : null
 }

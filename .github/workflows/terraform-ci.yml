@@ -32,15 +32,29 @@ jobs:
     name: Plan (LocalStack)
     runs-on: ubuntu-latest
     needs: fmt-validate
-    if: ${{ secrets.LOCALSTACK_AUTH_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
 
+      # secrets não pode ser usado em `if:` no nível de job — checar aqui
+      - name: Verificar secret LOCALSTACK_AUTH_TOKEN
+        id: localstack
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: |
+          if [ -n "$LOCALSTACK_AUTH_TOKEN" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Secret LOCALSTACK_AUTH_TOKEN não configurado — pulando plan LocalStack."
+          fi
+
       - uses: hashicorp/setup-terraform@v3
+        if: steps.localstack.outputs.enabled == 'true'
         with:
           terraform_version: "1.5.0"
 
       - name: Subir LocalStack
+        if: steps.localstack.outputs.enabled == 'true'
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         run: |
@@ -54,11 +68,13 @@ jobs:
           curl -sf http://localhost:4566/_localstack/health
 
       - name: Bootstrap bucket de state
+        if: steps.localstack.outputs.enabled == 'true'
         run: |
           export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1
           aws s3 mb s3://sre-terraform-state-local --endpoint-url=http://localhost:4566 2>/dev/null || true
 
       - name: Terraform init & plan
+        if: steps.localstack.outputs.enabled == 'true'
         run: |
           terraform init -backend-config=config/backend.local.hcl
           terraform plan -input=false -var-file=terraform.tfvars.example

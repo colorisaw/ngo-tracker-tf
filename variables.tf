@@ -32,7 +32,13 @@ variable "use_localstack" {
 }
 
 variable "localstack_endpoint" {
-  description = "URL base do LocalStack. Altere apenas se o serviço rodar em outro host/porta."
+  description = "URL do LocalStack para Terraform/AWS CLI no host (sua máquina)."
   type        = string
   default     = "http://localhost:4566"
+}
+
+variable "localstack_lambda_endpoint" {
+  description = "URL do LocalStack vista de dentro do container da Lambda. Com docker compose use http://localstack:4566; com docker run use host.docker.internal + LAMBDA_DOCKER_FLAGS."
+  type        = string
+  default     = "http://localstack:4566"
 }

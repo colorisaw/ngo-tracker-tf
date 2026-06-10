@@ -89,12 +89,21 @@ Ops / CI     ████████████████░░░░   80%
 
 ---
 
+## Fase 5 - Aplicação (API)
+
+- [x] API REST em `lambda/` (ONGs, doações, gastos, comprovantes S3)
+- [x] DynamoDB single-table (pk/sk + GSI)
+- [x] Documentação — [API.md](API.md)
+- [ ] `terraform apply` com novo código da Lambda
+- [ ] Testes manuais via `aws lambda invoke` (fluxo completo)
+
+---
+
 ## Próximos passos sugeridos
 
-1. **Agora:** validar Lambda + outputs (`terraform apply` + `aws lambda invoke`)
-2. **CI:** secret `LOCALSTACK_AUTH_TOKEN` no GitHub → conferir Actions verde
-3. **Depois:** código real da API em `lambda/handler.py`
-4. **Opcional:** deploy AWS real (`use_localstack = false`) quando quiser custo na nuvem
+1. `terraform apply` → testar fluxo em [API.md](API.md)
+2. Frontend ou Postman collection (opcional)
+3. Deploy AWS real (`use_localstack = false`) quando quiser API Gateway + nuvem
 
 ---
 
@@ -104,6 +113,6 @@ Ops / CI     ████████████████░░░░   80%
 - [Implementação do Terraform.md](TERRAFORM_IMPLEMENTATION.md)
 - [Passo a passo - Rodar localmente](RODAR_LOCALMENTE.md)
 - [Nomenclatura Padrão](NOMENCLATURA_PADRAO.md)
-- [Operação e Qualidade](OPERACAO_E_QUALIDADE.md)
+- [Lambda - API REST](docs/API.md)
 
 

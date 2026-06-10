@@ -9,9 +9,12 @@ services:
       SERVICES: s3,dynamodb,ec2,iam,sts,lambda,logs
       PERSISTENCE: "1"
       DEBUG: ${DEBUG:-0}
+      LAMBDA_DOCKER_FLAGS: --add-host=host.docker.internal:host-gateway
     volumes:
       - localstack-data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   localstack-data:

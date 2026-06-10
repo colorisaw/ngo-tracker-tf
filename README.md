@@ -28,16 +28,17 @@ flowchart TB
   Lambda --> Logs[CloudWatch Logs]
 ```
 
-A API (hoje um placeholder em Python) é o ponto central: lê/escreve auditoria de ONGs e doações no DynamoDB e armazena anexos/relatórios no S3.
+A API Lambda é o ponto central: CRUD de ONGs, registro de doações e gastos no DynamoDB, comprovantes no S3.
 
 ## Documentação
 
 - [Checklist](docs/CHECKLIST.md) - andamento do projeto (o que foi feito e o que falta)
+- [API REST](docs/API.md) - rotas, payloads e testes no LocalStack
 - [Nomenclatura padrão](docs/NOMENCLATURA_PADRAO.md) - convenções de naming de recursos
 - [Infra da aplicação](docs/INFRASTRUCTURE.md) - S3, DynamoDB, IAM, Lambda
 - [Implementação do Terraform](docs/TERRAFORM_IMPLEMENTATION.md) - mais detalhes do que foi feito no projeto e justificativa das escolhas
 - [Rodar localmente](docs/RODAR_LOCALMENTE.md) - passo a passo para subir Docker/LocalStack e ter a infra rodando localmente
-- [Fase 4 - Operação e CI](docs/FASE_4.md) - Docker Compose, API Gateway, GitHub Actions, AWS real
+- [Operação e CI](docs/OPERACAO_E_QUALIDADE.md) - Docker Compose, API Gateway, GitHub Actions, AWS real
 
 ## O projeto
 

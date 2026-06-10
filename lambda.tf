@@ -1,7 +1,8 @@
 data "archive_file" "lambda_api" {
   type        = "zip"
-  source_file = "${path.module}/lambda/handler.py"
+  source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/.build/${local.name_prefix}-lambda-api.zip"
+  excludes    = ["__pycache__", "*.pyc", ".pytest_cache"]
 }
 
 resource "aws_cloudwatch_log_group" "lambda_api" {
@@ -25,14 +26,17 @@ resource "aws_lambda_function" "api" {
   source_code_hash = data.archive_file.lambda_api.output_base64sha256
 
   timeout     = 30
-  memory_size = 128
+  memory_size = 256
 
   environment {
-    variables = {
-      ENVIRONMENT    = var.environment
-      DYNAMODB_TABLE = aws_dynamodb_table.main.name
-      S3_BUCKET      = aws_s3_bucket.app_data.bucket
-    }
+    variables = merge(
+      {
+        ENVIRONMENT    = var.environment
+        DYNAMODB_TABLE = aws_dynamodb_table.main.name
+        S3_BUCKET      = aws_s3_bucket.app_data.bucket
+      },
+      local.is_localstack ? { AWS_ENDPOINT_URL = var.localstack_lambda_endpoint } : {}
+    )
   }
 
   depends_on = [aws_cloudwatch_log_group.lambda_api]

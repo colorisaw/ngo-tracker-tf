@@ -81,6 +81,7 @@ docker rm -f localstack 2>/dev/null
 
 docker run -d --name localstack \
   -p 4566:4566 \
+  --add-host=host.docker.internal:host-gateway \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e LOCALSTACK_AUTH_TOKEN="${LOCALSTACK_AUTH_TOKEN}" \
   -e SERVICES=s3,dynamodb,ec2,iam,sts,eks,lambda,logs \
@@ -340,6 +341,7 @@ docker rm -f localstack
 
 docker run -d --name localstack \
   -p 4566:4566 \
+  --add-host=host.docker.internal:host-gateway \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e LOCALSTACK_AUTH_TOKEN="${LOCALSTACK_AUTH_TOKEN}" \
   -e SERVICES=s3,dynamodb,ec2,iam,sts,eks,lambda,logs \
@@ -368,6 +370,7 @@ docker rm -f localstack 2>/dev/null
 
 docker run -d --name localstack \
   -p 4566:4566 \
+  --add-host=host.docker.internal:host-gateway \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v localstack-data:/var/lib/localstack \
   -e LOCALSTACK_AUTH_TOKEN="${LOCALSTACK_AUTH_TOKEN}" \

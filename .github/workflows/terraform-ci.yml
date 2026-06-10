@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  TF_VERSION: "1.15.5"
+
 jobs:
   fmt-validate:
     name: Format & Validate
@@ -17,7 +20,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.5.0"
+          terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform fmt
         run: terraform fmt -check -recursive
@@ -35,7 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # secrets não pode ser usado em `if:` no nível de job — checar aqui
       - name: Verificar secret LOCALSTACK_AUTH_TOKEN
         id: localstack
         env:
@@ -51,7 +53,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         if: steps.localstack.outputs.enabled == 'true'
         with:
-          terraform_version: "1.5.0"
+          terraform_version: ${{ env.TF_VERSION }}
 
       - name: Subir LocalStack
         if: steps.localstack.outputs.enabled == 'true'

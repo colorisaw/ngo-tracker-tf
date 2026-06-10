@@ -14,7 +14,8 @@
 Fundação     ████████████████████  100%
 1º recurso   ████████████████████  100%
 App infra    ████████████████████  100%
-Ops / CI     ████████████████░░░░   80%
+Ops / CI     ████████████████████  100%
+App (API)    ████████████████░░░░   85%
 ```
 
 ---
@@ -71,10 +72,10 @@ Ops / CI     ████████████████░░░░   80%
 - [x] API Gateway HTTP (`api_gateway.tf`) — **somente AWS real** (LocalStack free não inclui apigatewayv2)
 - [x] Documentação - [OPERACAO_E_QUALIDADE.md](OPERACAO_E_QUALIDADE.md)
 - [x] `terraform apply` da Fase 4 no LocalStack (sem API Gateway; validar Lambda invoke)
-- [ ] Validar Lambda invoke pós-apply (`aws lambda invoke`)
+- [x] Validar Lambda invoke pós-apply (`aws lambda invoke`)
 - [x] Outputs `api_gateway_*` registrados no state (vazio no LocalStack)
-- [ ] Secret `LOCALSTACK_AUTH_TOKEN` configurado no GitHub
-- [ ] CI verde no repositório remoto (Actions)
+- [x] Secret `LOCALSTACK_AUTH_TOKEN` configurado no GitHub
+- [x] CI verde no repositório remoto (Actions)
 - [ ] Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`) — quando decidir deploy
 
 ---
@@ -94,16 +95,16 @@ Ops / CI     ████████████████░░░░   80%
 - [x] API REST em `lambda/` (ONGs, doações, gastos, comprovantes S3)
 - [x] DynamoDB single-table (pk/sk + GSI)
 - [x] Documentação — [API.md](API.md)
-- [ ] `terraform apply` com novo código da Lambda
-- [ ] Testes manuais via `aws lambda invoke` (fluxo completo)
+- [x] `terraform apply` com novo código da Lambda
+- [x] Testes manuais via `aws lambda invoke` (fluxo completo)
 
 ---
 
 ## Próximos passos sugeridos
 
-1. `terraform apply` → testar fluxo em [API.md](API.md)
-2. Frontend ou Postman collection (opcional)
-3. Deploy AWS real (`use_localstack = false`) quando quiser API Gateway + nuvem
+1. **Postman collection** — facilitar testes das rotas (LocalStack + AWS)
+2. **Deploy AWS real** (`use_localstack = false` + `backend.aws.hcl`) — API Gateway + nuvem
+3. **Frontend** (opcional) — painel para ONGs e doadores
 
 ---
 
@@ -113,6 +114,6 @@ Ops / CI     ████████████████░░░░   80%
 - [Implementação do Terraform.md](TERRAFORM_IMPLEMENTATION.md)
 - [Passo a passo - Rodar localmente](RODAR_LOCALMENTE.md)
 - [Nomenclatura Padrão](NOMENCLATURA_PADRAO.md)
-- [Lambda - API REST](docs/API.md)
+- [Lambda - API REST](API.md)
 
 

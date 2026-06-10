@@ -44,11 +44,16 @@ output "lambda_api_role_arn" {
 }
 
 output "api_gateway_url" {
-  description = "URL da HTTP API (null no LocalStack — licença free não inclui apigatewayv2)."
-  value       = local.create_api_gateway ? aws_apigatewayv2_stage.default[0].invoke_url : null
+  description = "URL da HTTP API. String vazia no LocalStack (apigatewayv2 fora da licença free)."
+  value       = try(aws_apigatewayv2_stage.default[0].invoke_url, "")
 }
 
 output "api_gateway_id" {
-  description = "ID da HTTP API (null no LocalStack)."
-  value       = local.create_api_gateway ? aws_apigatewayv2_api.main[0].id : null
+  description = "ID da HTTP API. String vazia no LocalStack."
+  value       = try(aws_apigatewayv2_api.main[0].id, "")
+}
+
+output "api_gateway_enabled" {
+  description = "true quando API Gateway foi provisionado (AWS real)."
+  value       = local.create_api_gateway
 }

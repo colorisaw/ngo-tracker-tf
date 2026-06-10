@@ -70,10 +70,12 @@ Ops / CI     ████████████████░░░░   80%
 - [x] CI GitHub Actions (`fmt`, `validate`, `plan` opcional com LocalStack)
 - [x] API Gateway HTTP (`api_gateway.tf`) — **somente AWS real** (LocalStack free não inclui apigatewayv2)
 - [x] Documentação - [OPERACAO_E_QUALIDADE.md](OPERACAO_E_QUALIDADE.md)
-- [ ] `terraform apply` da Fase 4 no LocalStack (sem API Gateway; validar Lambda invoke)
+- [x] `terraform apply` da Fase 4 no LocalStack (sem API Gateway; validar Lambda invoke)
+- [ ] Validar Lambda invoke pós-apply (`aws lambda invoke`)
+- [x] Outputs `api_gateway_*` registrados no state (vazio no LocalStack)
 - [ ] Secret `LOCALSTACK_AUTH_TOKEN` configurado no GitHub
-- [ ] CI verde no repositório remoto
-- [ ] Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`) - quando decidir deploy
+- [ ] CI verde no repositório remoto (Actions)
+- [ ] Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`) — quando decidir deploy
 
 ---
 
@@ -89,9 +91,10 @@ Ops / CI     ████████████████░░░░   80%
 
 ## Próximos passos sugeridos
 
-1. Seguir [documentação de Operação e Qualidade](OPERACAO_E_QUALIDADE.md): `docker compose up` → `apply` → testar API Gateway
-2. Configurar secret no GitHub e validar CI
-3. (Opcional) Deploy na AWS real quando sair do LocalStack
+1. **Agora:** validar Lambda + outputs (`terraform apply` + `aws lambda invoke`)
+2. **CI:** secret `LOCALSTACK_AUTH_TOKEN` no GitHub → conferir Actions verde
+3. **Depois:** código real da API em `lambda/handler.py`
+4. **Opcional:** deploy AWS real (`use_localstack = false`) quando quiser custo na nuvem
 
 ---
 

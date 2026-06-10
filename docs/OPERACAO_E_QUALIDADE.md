@@ -125,7 +125,7 @@ cat /tmp/lambda-out.json
 
 Esperado: JSON com `"ok": true`.
 
-`terraform output api_gateway_url` retorna `null` no LocalStack — isso é **esperado**.
+`terraform output api_gateway_url` retorna `""` (vazio) no LocalStack — isso é **esperado**. Use `api_gateway_enabled` para verificar (`false`).
 
 ### AWS real: API Gateway habilitado
 
@@ -242,7 +242,8 @@ aws lambda invoke \
   --endpoint-url=http://localhost:4566 \
   --cli-binary-format raw-in-base64-out /tmp/out.json && cat /tmp/out.json
 
-terraform output api_gateway_url   # esperado: null
+terraform output api_gateway_url      # esperado: "" (vazio) no LocalStack
+terraform output api_gateway_enabled  # esperado: false
 ```
 
 | Item | OK se… |
@@ -250,7 +251,7 @@ terraform output api_gateway_url   # esperado: null
 | Docker Compose | `docker compose ps` → `Up` |
 | Bootstrap | script retorna ✓ |
 | Lambda | invoke retorna `"ok": true` |
-| API Gateway | `api_gateway_url` = `null` (normal no LocalStack) |
+| API Gateway | `api_gateway_url` = `""` e `api_gateway_enabled` = `false` (normal no LocalStack) |
 | CI fmt/validate | job verde no GitHub |
 
 ### AWS real (quando fizer deploy)

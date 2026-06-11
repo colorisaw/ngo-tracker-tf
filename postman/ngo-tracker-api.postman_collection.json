@@ -315,7 +315,19 @@
             "header": [],
             "url": "{{base_url}}/"
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('API ok', () => pm.expect(pm.response.json().ok).to.eql(true));"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "2. Create NGO",
@@ -340,7 +352,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
                   "const json = pm.response.json();",
+                  "pm.test('Returns ngo_id', () => pm.expect(json.ngo.ngo_id).to.be.a('string'));",
                   "if (json.ngo && json.ngo.ngo_id) {",
                   "    pm.collectionVariables.set('ngo_id', json.ngo.ngo_id);",
                   "    if (pm.environment.name) pm.environment.set('ngo_id', json.ngo.ngo_id);",
@@ -366,7 +380,19 @@
             },
             "url": "{{base_url}}/ngos/{{ngo_id}}/donations"
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Donation created', () => pm.expect(pm.response.json().donation.amount).to.exist);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "4. Register expense",
@@ -384,7 +410,19 @@
             },
             "url": "{{base_url}}/ngos/{{ngo_id}}/expenses"
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Expense created', () => pm.expect(pm.response.json().expense.category).to.eql('racao'));"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "5. Upload receipt",
@@ -402,7 +440,19 @@
             },
             "url": "{{base_url}}/ngos/{{ngo_id}}/receipts"
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Receipt in S3', () => pm.expect(pm.response.json().receipt.key).to.include('receipts/'));"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "6. Summary",
@@ -418,9 +468,12 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
                   "pm.test('Summary has balance', () => {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json.summary).to.have.property('balance');",
+                  "    pm.expect(json.summary.total_donations).to.be.at.least(200);",
+                  "    pm.expect(json.summary.total_expenses).to.be.at.least(75);",
                   "});"
                 ]
               }

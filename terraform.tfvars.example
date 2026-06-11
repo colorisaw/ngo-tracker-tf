@@ -1,6 +1,11 @@
-project_name        = "ngo-tracker"
-aws_region          = "us-east-1"
-environment         = "dev"
-use_localstack              = true
-localstack_endpoint         = "http://localhost:4566"
-localstack_lambda_endpoint  = "http://localstack:4566"
+project_name = "ngo-tracker"
+aws_region   = "us-east-1"
+environment  = "dev"
+
+# --- LocalStack (dev local, custo zero) ---
+use_localstack             = true
+localstack_endpoint        = "http://localhost:4566"
+localstack_lambda_endpoint = "http://localstack:4566"
+
+# --- AWS real (deploy na nuvem) — veja docs/DEPLOY_AWS.md ---
+# use_localstack = false

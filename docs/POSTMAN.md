@@ -38,9 +38,32 @@ https://abc123xyz.execute-api.us-east-1.amazonaws.com/dev
 3. Demais requests usam `{{ngo_id}}` nas rotas
 4. Ou rode a pasta **Flow — Full audit** no Collection Runner (ordem já definida)
 
+## O que esperar do **Flow — Full audit**
+
+Rode só a pasta **Flow — Full audit** (não a collection inteira), com o environment AWS ativo.
+
+| Passo | Método | Status | Body (resumo) |
+|-------|--------|--------|----------------|
+| 1. Health | GET `/` | **200** | `{"ok":true,"service":"ngo-tracker-api",...}` |
+| 2. Create NGO | POST `/ngos` | **201** | `{"ngo":{"ngo_id":"uuid-...",...}}` — salva `ngo_id` |
+| 3. Register donation | POST `/ngos/{id}/donations` | **201** | `{"donation":{"amount":200,...}}` |
+| 4. Register expense | POST `/ngos/{id}/expenses` | **201** | `{"expense":{"amount":75,"category":"racao",...}}` |
+| 5. Upload receipt | POST `/ngos/{id}/receipts` | **201** | `{"receipt":{"bucket":"...","key":"ngos/.../receipts/..."}}` |
+| 6. Summary | GET `/ngos/{id}` | **200** | `{"ngo":{...},"summary":{"total_donations":200,"total_expenses":75,"balance":125,...}}` |
+
+No **Collection Runner**, ao final deve aparecer algo como **11 tests passed** (não "no tests found").
+
+### "no tests found" com status 201 — o que significa?
+
+- **201/200 = a API respondeu corretamente** (isso é o que importa para o fluxo).
+- **"no tests found"** = aquele request **não tinha** script `pm.test(...)` na aba **Tests** — o Postman só reporta testes automatizados, não valida sozinho o body.
+- As pastas **Health**, **NGOs**, etc. têm testes completos; a pasta **Flow** foi atualizada para incluir testes em todos os 6 passos.
+
+Se o passo 3+ falhar com 404, o passo 2 não gravou `ngo_id` — confira **Environment → ngo_id** após o Create NGO.
+
 ## Testes automáticos
 
-Cada request inclui scripts de teste (status code + campos esperados). Use **Run collection** para validar o fluxo inteiro.
+Requests nas pastas individuais e no **Flow** incluem scripts de teste (status + campos). Use **Run folder** na pasta Flow ou **Run collection** na collection inteira.
 
 ## LocalStack
 

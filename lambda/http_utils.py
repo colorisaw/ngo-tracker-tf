@@ -12,6 +12,12 @@ def parse_event(event: dict[str, Any]) -> tuple[str, str, dict[str, Any]]:
         http = event["requestContext"]["http"]
         method = http.get("method", "GET").upper()
         path = event.get("rawPath") or http.get("path", "/")
+        # API Gateway HTTP API inclui o stage no path (ex.: /dev/ngos → /ngos)
+        stage = event.get("requestContext", {}).get("stage")
+        if stage and stage != "$default" and path.startswith(f"/{stage}"):
+            path = path[len(stage) + 1 :] or "/"
+            if not path.startswith("/"):
+                path = f"/{path}"
     elif "httpMethod" in event:
         method = event["httpMethod"].upper()
         path = event.get("path", "/")

@@ -1,6 +1,6 @@
 # Checklist do projeto - NGO Tracker TF
 
-> Última revisão: maio/2026 - progresso geral ~95%.
+> Última revisão: junho/2026 - progresso geral ~98%.
 
 **Legenda:** `[x]` feito · `[ ]` pendente · `[-]` adiado de propósito
 
@@ -9,13 +9,14 @@
 ## Progresso geral
 
 ```
-[███████████████████████████░]  ~95%
+[████████████████████████████]  ~98%
 
 Fundação     ████████████████████  100%
 1º recurso   ████████████████████  100%
 App infra    ████████████████████  100%
 Ops / CI     ████████████████████  100%
-App (API)    ████████████████░░░░   85%
+App (API)    ████████████████████  100%
+AWS deploy   ████████████████████  100%
 ```
 
 ---
@@ -76,7 +77,7 @@ App (API)    ████████████████░░░░   85%
 - [x] Outputs `api_gateway_*` registrados no state (vazio no LocalStack)
 - [x] Secret `LOCALSTACK_AUTH_TOKEN` configurado no GitHub
 - [x] CI verde no repositório remoto (Actions)
-- [ ] Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`) — quando decidir deploy
+- [x] Ambiente AWS real (`use_localstack = false` + `backend.aws.hcl`) — [DEPLOY_AWS.md](DEPLOY_AWS.md)
 
 ---
 
@@ -103,9 +104,10 @@ App (API)    ████████████████░░░░   85%
 
 ## Próximos passos sugeridos
 
-1. ~~**Postman collection**~~ — [POSTMAN.md](POSTMAN.md) (`postman/`)
-2. **Deploy AWS real** (`use_localstack = false` + `backend.aws.hcl`) — API Gateway + nuvem
-3. **Frontend** (opcional) — painel para ONGs e doadores
+1. ~~**Postman collection**~~ — [POSTMAN.md](POSTMAN.md)
+2. ~~**Deploy AWS real**~~ — [DEPLOY_AWS.md](DEPLOY_AWS.md)
+3. Testar API na AWS via Postman (`api_gateway_url` no environment)
+4. **Frontend** (opcional) — painel para ONGs e doadores
 
 ---
 

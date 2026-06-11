@@ -40,3 +40,6 @@ Thumbs.db
 localstack-data/
 volume/
 .env.localstack
+
+# AWS real (credenciais locais — nunca versionar)
+.env.aws

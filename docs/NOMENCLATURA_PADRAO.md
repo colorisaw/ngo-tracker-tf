@@ -70,7 +70,7 @@ O **state** não usa `name_prefix` da aplicação - evita misturar infra de cont
 | Contexto | Bucket S3 (state) | Key do state |
 |----------|-------------------|--------------|
 | LocalStack (`backend.local.hcl`) | `sre-terraform-state-local` | `dev/terraform.tfstate` |
-| AWS real (`backend.aws.hcl`) | `sre-terraform-state` | `dev/terraform.tfstate` |
+| AWS real (`backend.aws.hcl`) | `sre-terraform-state-<ACCOUNT_ID>` | `dev/terraform.tfstate` |
 
 Lock: `use_lockfile = true` (arquivo de lock no próprio bucket S3).
 

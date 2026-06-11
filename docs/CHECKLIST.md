@@ -106,7 +106,7 @@ AWS deploy   ████████████████████  100%
 
 1. ~~**Postman collection**~~ — [POSTMAN.md](POSTMAN.md)
 2. ~~**Deploy AWS real**~~ — [DEPLOY_AWS.md](DEPLOY_AWS.md)
-3. Testar API na AWS via Postman (`api_gateway_url` no environment)
+3. ~~Testar API na AWS via Postman~~ (`api_gateway_url` + environment ativo)
 4. **Frontend** (opcional) — painel para ONGs e doadores
 
 ---

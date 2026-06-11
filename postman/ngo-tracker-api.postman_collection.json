@@ -8,11 +8,28 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/dev"
+      "value": ""
     },
     {
       "key": "ngo_id",
       "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const base = pm.variables.get('base_url');",
+          "if (!base || base.includes('YOUR_API_ID')) {",
+          "    throw new Error(",
+          "        'base_url não configurado. Importe aws-dev.postman_environment.json, ' +",
+          "        'ative o environment no canto superior direito e defina base_url = terraform output -raw api_gateway_url'",
+          "    );",
+          "}"
+        ]
+      }
     }
   ],
   "item": [

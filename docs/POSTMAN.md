@@ -8,7 +8,9 @@ Collection para testar a API via **HTTP** (API Gateway na AWS). Arquivos em `pos
 2. Selecione:
    - `postman/ngo-tracker-api.postman_collection.json`
    - `postman/aws-dev.postman_environment.json`
-3. Ative o environment **NGO Tracker — AWS Dev**
+3. Ative o environment **NGO Tracker — AWS Dev** (dropdown no canto superior direito — **obrigatório**)
+
+> Só importar a collection **não basta**. Sem environment ativo, `{{base_url}}` fica vazio ou com placeholder e todas as requests falham com **no response**.
 
 ## Configurar `base_url` (AWS)
 
@@ -64,6 +66,23 @@ Se o passo 3+ falhar com 404, o passo 2 não gravou `ngo_id` — confira **Envir
 ## Testes automáticos
 
 Requests nas pastas individuais e no **Flow** incluem scripts de teste (status + campos). Use **Run folder** na pasta Flow ou **Run collection** na collection inteira.
+
+## Troubleshooting
+
+### "no response" em todas as requests (inclusive Health)
+
+A API está ok se `curl` funciona — o problema é configuração do Postman:
+
+1. **Environment ativo?** Canto superior direito deve mostrar **NGO Tracker — AWS Dev** (não "No environment").
+2. **`base_url` preenchido?** Environments → edit → `base_url` = URL real, por exemplo:
+   ```
+   https://iqhz5opgg9.execute-api.us-east-1.amazonaws.com/dev
+   ```
+   Sem barra no final. **Não** deixe `YOUR_API_ID` nem vazio.
+3. Obter URL atual: `terraform output -raw api_gateway_url`
+4. Proxy do Postman desligado? Settings → Proxy → desmarque se não usar proxy corporativo.
+
+Se `base_url` estiver errado, o Postman não resolve o DNS → **no response** (não é 404/500).
 
 ## LocalStack
 

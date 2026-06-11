@@ -38,6 +38,18 @@ def parse_event(event: dict[str, Any]) -> tuple[str, str, dict[str, Any]]:
     return method, path, body
 
 
+def cors_preflight_response() -> dict[str, Any]:
+    return {
+        "statusCode": 204,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+            "Access-Control-Allow-Headers": "content-type",
+        },
+        "body": "",
+    }
+
+
 def json_response(status: int, payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "statusCode": status,

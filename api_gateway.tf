@@ -4,6 +4,13 @@ resource "aws_apigatewayv2_api" "main" {
   name          = "${local.name_prefix}-http-api"
   protocol_type = "HTTP"
 
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_headers = ["content-type"]
+    max_age       = 300
+  }
+
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-http-api"
   })

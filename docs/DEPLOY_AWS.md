@@ -35,7 +35,15 @@ chmod 600 .env.aws
 # edite com suas keys IAM
 ```
 
-O `deploy-aws.sh` carrega `.env.aws` automaticamente. O arquivo está no `.gitignore`.
+O `deploy-aws.sh` e `terraform-aws.sh` carregam `.env.aws` com `set -a` (exportam ao processo filho). O arquivo está no `.gitignore`.
+
+> **Armadilha:** `source .env.aws` **sem** `export` nas variáveis ou sem `set -a` define valores só no shell atual — o **Terraform não vê** (erro `No valid credential sources`).
+>
+> ```bash
+> set -a && source .env.aws && set +a && terraform apply
+> # ou
+> ./scripts/terraform-aws.sh apply
+> ```
 
 #### Opção C — variáveis no terminal (sessão atual)
 

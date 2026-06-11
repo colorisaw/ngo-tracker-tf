@@ -15,13 +15,17 @@ Rotas:
 
 import os
 
-from http_utils import error_response, json_response, match_route, parse_event
+from http_utils import cors_preflight_response, error_response, json_response, match_route, parse_event
 import repository as repo
 
 
 def handler(event, context):
     try:
         method, path, body = parse_event(event or {})
+
+        if method == "OPTIONS":
+            return cors_preflight_response()
+
         route, params = match_route(path)
 
         if route is None:

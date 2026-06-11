@@ -99,6 +99,7 @@ AWS deploy   ████████████████████  100%
 - [x] `terraform apply` com novo código da Lambda
 - [x] Testes manuais via `aws lambda invoke` (fluxo completo)
 - [x] Postman collection — [POSTMAN.md](POSTMAN.md)
+- [x] Frontend web — [FRONTEND.md](FRONTEND.md)
 
 ---
 
@@ -107,7 +108,9 @@ AWS deploy   ████████████████████  100%
 1. ~~**Postman collection**~~ — [POSTMAN.md](POSTMAN.md)
 2. ~~**Deploy AWS real**~~ — [DEPLOY_AWS.md](DEPLOY_AWS.md)
 3. ~~Testar API na AWS via Postman~~ (`api_gateway_url` + environment ativo)
-4. **Frontend** (opcional) — painel para ONGs e doadores
+4. **Frontend** — [FRONTEND.md](FRONTEND.md) (`frontend/`)
+5. `terraform apply` na AWS (CORS no API Gateway)
+6. Publicar `frontend/dist` em S3 + CloudFront (opcional)
 
 ---
 
@@ -119,5 +122,6 @@ AWS deploy   ████████████████████  100%
 - [Nomenclatura Padrão](NOMENCLATURA_PADRAO.md)
 - [Lambda - API REST](API.md)
 - [Postman collection](POSTMAN.md)
+- [Frontend web](FRONTEND.md)
 
 

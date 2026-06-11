@@ -36,6 +36,7 @@ A API Lambda é o ponto central: CRUD de ONGs, registro de doações e gastos no
 - [API REST](docs/API.md) - rotas, payloads e testes no LocalStack
 - [Postman](docs/POSTMAN.md) - collection para testes via API Gateway (AWS)
 - [Deploy AWS](docs/DEPLOY_AWS.md) - sair do LocalStack e provisionar na nuvem
+- [Frontend](docs/FRONTEND.md) - painel web (`frontend/`)
 - [Nomenclatura padrão](docs/NOMENCLATURA_PADRAO.md) - convenções de naming de recursos
 - [Infra da aplicação](docs/INFRASTRUCTURE.md) - S3, DynamoDB, IAM, Lambda
 - [Implementação do Terraform](docs/TERRAFORM_IMPLEMENTATION.md) - mais detalhes do que foi feito no projeto e justificativa das escolhas

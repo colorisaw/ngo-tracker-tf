@@ -57,3 +57,18 @@ output "api_gateway_enabled" {
   description = "true quando API Gateway foi provisionado (AWS real)."
   value       = local.create_api_gateway
 }
+
+output "s3_web_bucket_name" {
+  description = "Bucket S3 do frontend estático. Vazio no LocalStack."
+  value       = try(aws_s3_bucket.web[0].bucket, "")
+}
+
+output "cloudfront_distribution_id" {
+  description = "ID da distribuição CloudFront. Vazio no LocalStack."
+  value       = try(aws_cloudfront_distribution.web[0].id, "")
+}
+
+output "cloudfront_url" {
+  description = "URL pública do frontend (HTTPS). Vazio no LocalStack."
+  value       = try("https://${aws_cloudfront_distribution.web[0].domain_name}", "")
+}

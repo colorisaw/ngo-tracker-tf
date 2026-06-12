@@ -108,9 +108,8 @@ AWS deploy   ████████████████████  100%
 1. ~~**Postman collection**~~ — [POSTMAN.md](POSTMAN.md)
 2. ~~**Deploy AWS real**~~ — [DEPLOY_AWS.md](DEPLOY_AWS.md)
 3. ~~Testar API na AWS via Postman~~ (`api_gateway_url` + environment ativo)
-4. **Frontend** — [FRONTEND.md](FRONTEND.md) (`frontend/`)
-5. `terraform apply` na AWS (CORS no API Gateway)
-6. Publicar `frontend/dist` em S3 + CloudFront (opcional)
+4. ~~**Frontend**~~ — [FRONTEND.md](FRONTEND.md) (dev local ✅)
+5. Publicar frontend na AWS — `./scripts/terraform-aws.sh apply` + `./scripts/deploy-frontend.sh`
 
 ---
 

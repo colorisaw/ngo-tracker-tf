@@ -36,15 +36,40 @@ Na primeira visita, configure a **URL da API** em ⚙ Configurações (salva no 
 
 ---
 
-## Build para produção
+## Publicar na AWS (S3 + CloudFront)
+
+**Pré-requisito:** `use_localstack = false` e `./scripts/terraform-aws.sh apply` (cria bucket + CDN).
+
+```bash
+chmod +x scripts/deploy-frontend.sh
+./scripts/deploy-frontend.sh
+```
+
+O script:
+1. Lê `api_gateway_url` do Terraform
+2. Roda `npm run build` com `VITE_API_URL` embutido
+3. Faz upload para `s3://ngo-tracker-dev-web/`
+4. Invalida cache do CloudFront
+
+URL pública:
+
+```bash
+./scripts/terraform-aws.sh output -raw cloudfront_url
+```
+
+Infra em `frontend_hosting.tf` (S3 privado + OAC + CloudFront). Bucket **separado** de `ngo-tracker-dev-data` (comprovantes).
+
+---
+
+## Build para produção (manual)
 
 ```bash
 cd frontend
-npm run build
+VITE_API_URL="$(cd .. && ./scripts/terraform-aws.sh output -raw api_gateway_url)" npm run build
 npm run preview   # testar dist/ em http://localhost:4173
 ```
 
-Artefatos em `frontend/dist/` — podem ser publicados em S3 + CloudFront (fase futura).
+Artefatos em `frontend/dist/`.
 
 ---
 

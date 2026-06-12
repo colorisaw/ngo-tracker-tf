@@ -3,6 +3,8 @@ locals {
 
   create_api_gateway = !local.is_localstack
 
+  create_frontend_hosting = !local.is_localstack
+
   project_name = var.project_name
   name_prefix  = "${local.project_name}-${var.environment}"
 
